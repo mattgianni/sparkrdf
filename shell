@@ -1,0 +1,8 @@
+#!/bin/bash
+
+pushd tmp
+spark-shell \
+	--master local[*] \
+	--name "SparkRDF" \
+	--packages "org.apache.jena:jena-arq:2.13.0"
+popd
