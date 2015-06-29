@@ -4,5 +4,7 @@ pushd tmp
 spark-shell \
 	--master local[*] \
 	--name "SparkRDF" \
+	--driver-memory 4g \
+	--jars /Users/mattg/Projects/Spark/sparkrdf/target/scala-2.10/sparkrdf-0.1.jar \
 	--packages "org.apache.jena:jena-arq:2.13.0"
 popd
