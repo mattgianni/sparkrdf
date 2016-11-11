@@ -4,7 +4,7 @@ class Triple(val s: Node, val p: Node, val o: Node) extends Serializable {
   override def toString = s + " " + p + " " + o
 }
 
-/** Factory method for [[org.gianni.sparkrdf.Triple]] instances. */
+/** Factory method for [[Triple]] instances. */
 object Triple {
   def apply(nt: String) = {
     val parts = RDF.stripTerminus(nt).split("\\s+", 3)

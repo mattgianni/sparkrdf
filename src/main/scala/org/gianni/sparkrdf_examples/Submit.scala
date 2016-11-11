@@ -1,6 +1,6 @@
 package org.gianni.sparkrdf_examples
 
-import java.io.InputStream
+import java.io.ByteArrayInputStream
 import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RiotReader
 import org.apache.spark.SparkConf
@@ -15,30 +15,16 @@ import com.hp.hpl.jena.rdf.model.Model
 import com.hp.hpl.jena.rdf.model.ModelFactory
 import org.gianni.sparkrdf._
 
-class StringInputStream(s: String) extends InputStream {
-  private val bytes = s.getBytes
-
-  private var pos = 0
-
-  override def read(): Int = if (pos >= bytes.length) {
-    -1
-  } else {
-    val r = bytes(pos)
-    pos += 1
-    r.toInt
-  }
-}
-
 object Submit {
 
-  val conf = new SparkConf().setMaster("local[*]").setAppName("SparkRDF")
-  val sc: SparkContext = new SparkContext(conf)
+  private val conf = new SparkConf().setMaster("local[*]").setAppName("SparkRDF")
+  private val sc: SparkContext = new SparkContext(conf)
 
   // val fn = "/Users/mattg/Projects/Spark/sparkrdf/data/nyse.nt"
-  val fn = "/Users/mattg/Projects/Spark/sparkrdf/data/bio2rdf_10K.nq"
+  private val fn = "/Users/mattg/Projects/Spark/sparkrdf/data/bio2rdf_10K.nq"
 
   def parseTriple(line: String) = {
-    val trip = RiotReader.createIteratorTriples(new StringInputStream(line), Lang.NTRIPLES, "").next
+    val trip = RiotReader.createIteratorTriples(new ByteArrayInputStream(line.getBytes), Lang.NTRIPLES, "").next
     (trip.getSubject.toString, trip.getPredicate.toString, if (trip.getObject.isLiteral) trip.getObject.getLiteralValue.toString else trip.getObject.toString)
   }
 
@@ -47,12 +33,12 @@ object Submit {
     (uri.take(i + 1), uri.takeRight(uri.length - i - 1))
   }
   
-  /**
-   * remove the trailing ' .' from an n-triple string
+  /** Removes the trailing terminator from an n-triple string.
+   * @param line an n-triple formatted string
+   * @return the n-triple string without the trailing terminator
    */
-  def stripTerminus(line: String): String = {
+  def stripTerminus(line: String): String = 
     if (line.length < 2 || line.takeRight(2) != " .") line else line.take(line.length - 2)
-  }
   
   def stripPerimeter(item: String): String = if (item.length >= 2) item.substring(1, item.length - 1) else item
 
@@ -85,8 +71,10 @@ object Submit {
  */
     val fn = "/Users/mattg/Projects/Spark/sparkrdf/data/nyse.nt"
     val text = sc.textFile(fn)
-
+    
     text.map( x => Triple(x) )
+    
+
     
     val rs = text.map(parseTriple)
 

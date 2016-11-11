@@ -4,6 +4,7 @@ import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RiotReader
 import java.io.InputStream
 
+/** Static RDF related utilities. */
 object RDF {
 
   class StringInputStream(s: String) extends InputStream {
@@ -11,20 +12,42 @@ object RDF {
 
     private var pos = 0
 
-    override def read(): Int = if (pos >= bytes.length) {
-      -1
-    } else {
-      val r = bytes(pos)
-      pos += 1
-      r.toInt
-    }
+    override def read(): Int =
+      if (pos >= bytes.length) {
+        -1
+      } else {
+        val r = bytes(pos)
+        pos += 1
+        r.toInt
+      }
   }
 
+  /**
+   * Removes the first and last characters from a string.
+   * If the input string doesn't have at least 2 characters, the original
+   * string is returned. This utility is usually used to remove the bracketing
+   * characters from an RDF object. In most cases this are the &lt; or &gt;
+   * characters that surround RDF URIs.
+   *
+   * {{{
+   * scala> val meat = RDF.stripPerimeter("&lt;http://xmlns.com/foaf/0.1/knows&gt;")
+   * meat: String = http://xmlns.com/foaf/0.1/knows
+   * }}}
+   *
+   * @param item the input string
+   * @return the inner portion of the string, with the "outside" characters removed.
+   */
   def stripPerimeter(item: String): String = if (item.length >= 2) item.substring(1, item.length - 1) else item
 
+  /**
+   * Removes the line terminator from an [[http://www.w3.org/TR/n-triples/ N-Triples]] line.
+   * @param line the input line.
+   * @return the n-triple with the terminating space-dot removed.
+   */
   def stripTerminus(line: String): String =
     if (line.length < 2 || line.takeRight(2) != " .") line else line.take(line.length - 2)
 
+  // TODO: creating an iterator for each line seems wasteful.
   def parseTriple(line: String) = {
     val trip = RiotReader.createIteratorTriples(new StringInputStream(line), Lang.NTRIPLES, "").next
     (trip.getSubject.toString,
