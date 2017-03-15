@@ -5,7 +5,6 @@ import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RiotReader
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext.rddToPairRDDFunctions
 import org.apache.spark.graphx.Edge
 import org.apache.spark.graphx.Graph
 import org.apache.spark.graphx.Graph.graphToGraphOps
@@ -21,7 +20,7 @@ object Submit {
   private val sc: SparkContext = new SparkContext(conf)
 
   // val fn = "/Users/mattg/Projects/Spark/sparkrdf/data/nyse.nt"
-  private val fn = "/Users/mattg/Projects/Spark/sparkrdf/data/bio2rdf_10K.nq"
+  private val fn = "data/bio2rdf_10K.nq"
 
   def parseTriple(line: String) = {
     val trip = RiotReader.createIteratorTriples(new ByteArrayInputStream(line.getBytes), Lang.NTRIPLES, "").next
@@ -69,7 +68,7 @@ object Submit {
 :load ../src/main/scala/org/gianni/sparkrdf/Triple.scala
 
  */
-    val fn = "/Users/mattg/Projects/Spark/sparkrdf/data/nyse.nt"
+    val fn = "data/nyse.nt"
     val text = sc.textFile(fn)
     
     text.map( x => Triple(x) )

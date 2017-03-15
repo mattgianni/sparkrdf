@@ -6,3 +6,5 @@ project/target/
 .settings/
 *.crc
 tmp/
+.cache-main
+bin/
